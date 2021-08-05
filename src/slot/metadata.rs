@@ -2,7 +2,6 @@ use core::sync::atomic::AtomicU64;
 use core::mem::{size_of};
 
 use crate::utility::*;
-use crate::bitvec;
 
 const EMPTY: u8 = 1 << 7;        // 0b10000000
 const DELETED: u8 = u8::MAX - 1; // 0b11111110
