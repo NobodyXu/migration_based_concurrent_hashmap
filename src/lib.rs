@@ -2,6 +2,7 @@
 
 extern crate arc_swap;
 extern crate bitvec;
+extern crate init_array;
 extern crate static_assertions;
 
 use static_assertions::{const_assert, const_assert_eq};
