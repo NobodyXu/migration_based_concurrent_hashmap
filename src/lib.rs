@@ -8,6 +8,8 @@ use static_assertions::{const_assert, const_assert_eq};
 #[cfg(test)]
 extern crate assert_matches;
 
+mod utility;
+
 pub use arc_swap::RefCnt;
 
 mod value;
