@@ -1,5 +1,8 @@
 extern crate arc_swap;
 extern crate atomic;
+extern crate static_assertions;
+
+use static_assertions::const_assert;
 
 #[cfg(test)]
 extern crate assert_matches;
