@@ -1,8 +1,9 @@
+//! This implementation is partly inspired from swisstable
+
 extern crate arc_swap;
-extern crate atomic;
 extern crate static_assertions;
 
-use static_assertions::const_assert;
+use static_assertions::{const_assert, const_assert_eq};
 
 #[cfg(test)]
 extern crate assert_matches;
