@@ -6,6 +6,7 @@ use crate::RefCnt;
 #[derive(Copy, Clone, Debug)]
 pub struct SlotIndex(u8);
 impl SlotIndex {
+    #[inline(always)]
     pub const fn new(index: u8) -> Option<Self> {
         if index < 2 || index == u8::MAX {
             None
@@ -17,18 +18,22 @@ impl SlotIndex {
     /// # Safety
     ///
     ///  - `index` - Must be greater than `1` and less than or equal to `Self::max()`.
+    #[inline(always)]
     pub const unsafe fn new_unchecked(index: u8) -> Self {
         Self(index)
     }
 
+    #[inline(always)]
     pub const fn to_raw(self) -> u8 {
         self.0
     }
 
+    #[inline(always)]
     const fn max() -> usize {
         (u8::MAX - 1) as usize
     }
 
+    #[inline(always)]
     const fn to_ptr(self) -> *mut () {
         self.0 as *mut ()
     }
