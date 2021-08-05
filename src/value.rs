@@ -21,6 +21,10 @@ impl SlotIndex {
         Self(index)
     }
 
+    pub(crate) const fn to_raw(self) -> u8 {
+        self.0
+    }
+
     const fn max() -> usize {
         (u8::MAX - 1) as usize
     }
