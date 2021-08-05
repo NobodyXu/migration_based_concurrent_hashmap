@@ -133,4 +133,21 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_no_arc() {
+        let value = Value::Some(None);
+
+        assert_eq!(SlotIndex::max() + 1, RefCnt::as_ptr(&value) as usize);
+        assert_eq!(SlotIndex::max() + 1, RefCnt::inc(&value) as usize);
+        unsafe {
+            <Value as RefCnt>::dec((SlotIndex::max() + 1) as *const ());
+        }
+        assert_eq!(SlotIndex::max() + 1, RefCnt::into_ptr(value) as usize);
+
+        assert_matches!(
+            unsafe { RefCnt::from_ptr((SlotIndex::max() + 1) as *const ()) },
+            Value::Some(None)
+        );
+    }
 }
