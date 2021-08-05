@@ -45,6 +45,11 @@ pub enum Value<T: RefCnt> {
     Migrated(SlotIndex),
     Some(T),
 }
+impl<T: RefCnt> Default for Value<T> {
+    fn default() -> Self {
+        Self::None
+    }
+}
 impl<T: RefCnt> Value<T> {
     fn map_ptr(ptr: *mut T::Base) -> *mut T::Base {
         if ptr.is_null() {
