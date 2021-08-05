@@ -103,4 +103,21 @@ mod tests {
             Value::None
         );
     }
+
+    #[test]
+    fn test_migrated() {
+        for i in 2..(u8::MAX) {
+            let index = SlotIndex::new(i).unwrap();
+            assert_eq!(i as usize, index.to_ptr() as usize);
+
+            let value = Value::Migrated(index);
+            assert_eq!(i as usize, RefCnt::as_ptr(&value) as usize);
+            assert_eq!(i as usize, RefCnt::into_ptr(value) as usize);
+
+            assert_matches!(
+                unsafe { RefCnt::from_ptr(i as usize as *const _) },
+                Value::Migrated(index) if index.to_raw() == i
+            );
+        }
+    }
 }
