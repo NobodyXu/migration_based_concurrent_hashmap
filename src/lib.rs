@@ -1,4 +1,5 @@
 extern crate arc_swap;
+extern crate atomic;
 
 #[cfg(test)]
 extern crate assert_matches;
@@ -9,3 +10,5 @@ mod value;
 
 pub use value::SlotIndex;
 use value::Value;
+
+mod slot;
