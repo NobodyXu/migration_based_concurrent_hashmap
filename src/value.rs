@@ -29,7 +29,7 @@ impl SlotIndex {
         (u8::MAX - 1) as usize
     }
 
-    fn to_ptr(self) -> *mut () {
+    const fn to_ptr(self) -> *mut () {
         self.0 as *mut ()
     }
 }
