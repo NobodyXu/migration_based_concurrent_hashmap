@@ -21,7 +21,7 @@ impl SlotIndex {
         Self(index)
     }
 
-    pub(crate) const fn to_raw(self) -> u8 {
+    pub const fn to_raw(self) -> u8 {
         self.0
     }
 
