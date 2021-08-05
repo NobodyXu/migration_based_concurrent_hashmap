@@ -155,18 +155,18 @@ mod tests {
     fn test_arc() {
         let arc = Arc::new(());
         let ptr = Arc::as_ptr(&arc);
-        let value = Value::Some(Some(arc.clone()));
+        let value = Value::Some(Some(arc));
 
         assert_eq!(ptr, RefCnt::as_ptr(&value));
         assert_eq!(ptr, RefCnt::inc(&value));
         unsafe {
             <Value as RefCnt>::dec(ptr);
         }
-        assert_eq!(ptr, RefCnt::into_ptr(value));
-
         assert_matches!(
             unsafe { RefCnt::from_ptr(ptr) },
             Value::Some(Some(arc)) if Arc::as_ptr(&arc) == ptr
         );
+
+        assert_eq!(ptr, RefCnt::into_ptr(value));
     }
 }
