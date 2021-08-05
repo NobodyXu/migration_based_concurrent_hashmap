@@ -1,4 +1,11 @@
-pub extern crate arc_swap;
+extern crate arc_swap;
+
+pub use arc_swap::RefCnt;
+
+mod value;
+
+pub use value::SlotIndex;
+use value::Value;
 
 #[cfg(test)]
 mod tests {
