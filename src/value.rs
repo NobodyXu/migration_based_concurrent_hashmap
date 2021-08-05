@@ -121,6 +121,10 @@ mod tests {
 
             let value = Value::Migrated(index);
             assert_eq!(i as usize, RefCnt::as_ptr(&value) as usize);
+            assert_eq!(i as usize, RefCnt::inc(&value) as usize);
+            unsafe {
+                <Value as RefCnt>::dec(index.to_ptr());
+            }
             assert_eq!(i as usize, RefCnt::into_ptr(value) as usize);
 
             assert_matches!(
