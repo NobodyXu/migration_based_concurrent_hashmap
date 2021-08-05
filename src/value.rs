@@ -101,6 +101,10 @@ mod tests {
         let value = Value::None;
 
         assert_eq!(ptr::null_mut(), RefCnt::as_ptr(&value));
+        assert_eq!(ptr::null_mut(), RefCnt::inc(&value));
+        unsafe {
+            <Value as RefCnt>::dec(ptr::null_mut());
+        }
         assert_eq!(ptr::null_mut(), RefCnt::into_ptr(value));
 
         assert_matches!(
