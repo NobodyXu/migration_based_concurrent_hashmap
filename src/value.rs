@@ -30,7 +30,7 @@ impl SlotIndex {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Value<T: RefCnt> {
     None,
     Migrated(SlotIndex),
@@ -74,5 +74,29 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
         } else {
             Self::Some(T::from_ptr(ptr))
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use core::ptr;
+    use assert_matches::assert_matches;
+
+    use super::{SlotIndex, RefCnt};
+
+    type Arc = std::sync::Arc<()>;
+    type Value = super::Value<Option<Arc>>;
+
+    #[test]
+    fn test_none() {
+        let value = Value::None;
+
+        assert_eq!(ptr::null_mut(), RefCnt::as_ptr(&value));
+        assert_eq!(ptr::null_mut(), RefCnt::into_ptr(value));
+
+        assert_matches!(
+            unsafe { RefCnt::from_ptr(ptr::null()) },
+            Value::None
+        );
     }
 }
