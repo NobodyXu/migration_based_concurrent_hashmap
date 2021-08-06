@@ -1,5 +1,3 @@
-//! This implementation is partly inspired from swisstable
-
 extern crate arc_swap;
 extern crate bitvec;
 extern crate init_array;
