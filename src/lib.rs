@@ -17,4 +17,5 @@ mod utility;
 mod value;
 pub use value::SlotIndex;
 
+pub mod simple_table;
 pub mod swiss_like_table;
