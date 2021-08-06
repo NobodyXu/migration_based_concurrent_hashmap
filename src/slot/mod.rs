@@ -16,3 +16,4 @@ const fn H2(hash: usize) -> u8 {
 /// Also, deleted entries cannot be reused.
 /// Otherwise, there will be data race.
 mod metadata;
+mod data;
