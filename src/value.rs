@@ -47,6 +47,7 @@ pub enum Value<T: RefCnt> {
     Some(T),
 }
 impl<T: RefCnt> Default for Value<T> {
+    #[inline(always)]
     fn default() -> Self {
         Self::None
     }
