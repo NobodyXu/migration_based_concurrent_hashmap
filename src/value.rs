@@ -42,6 +42,7 @@ impl SlotIndex {
 #[derive(Clone, Debug)]
 pub enum Value<T: RefCnt> {
     None,
+    Deleted,
     Migrated(SlotIndex),
     Some(T),
 }
@@ -65,6 +66,7 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
     fn into_ptr(me: Self) -> *mut Self::Base {
         match me {
             Self::None => ptr::null_mut(),
+            Self::Deleted => 1 as *mut Self::Base,
             Self::Migrated(index) => index.to_ptr() as *mut Self::Base,
             Self::Some(value) => Self::map_ptr(RefCnt::into_ptr(value)),
         }
@@ -73,6 +75,7 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
     fn as_ptr(me: &Self) -> *mut Self::Base {
         match me {
             Self::None => ptr::null_mut(),
+            Self::Deleted => 1 as *mut Self::Base,
             Self::Migrated(index) => index.to_ptr() as *mut Self::Base,
             Self::Some(value) => Self::map_ptr(RefCnt::as_ptr(value)),
         }
@@ -81,6 +84,8 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
     unsafe fn from_ptr(ptr: *const Self::Base) -> Self {
         if ptr.is_null() {
             Self::None
+        } else if (ptr as usize) == 1 {
+            Self::Deleted
         } else if (ptr as usize) <= SlotIndex::max() {
             Self::Migrated(SlotIndex::new_unchecked(ptr as u8))
         } else if (ptr as usize) == (SlotIndex::max() + 1) {
@@ -115,6 +120,24 @@ mod tests {
         assert_matches!(
             unsafe { RefCnt::from_ptr(ptr::null()) },
             Value::None
+        );
+    }
+
+    #[test]
+    fn test_deleted() {
+        let value = Value::Deleted;
+        let ptr = 1 as *mut _;
+
+        assert_eq!(ptr, RefCnt::as_ptr(&value));
+        assert_eq!(ptr, RefCnt::inc(&value));
+        unsafe {
+            <Value as RefCnt>::dec(ptr);
+        }
+        assert_eq!(ptr, RefCnt::into_ptr(value));
+
+        assert_matches!(
+            unsafe { RefCnt::from_ptr(ptr) },
+            Value::Deleted
         );
     }
 
