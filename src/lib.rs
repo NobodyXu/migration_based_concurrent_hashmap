@@ -1,6 +1,7 @@
 extern crate arc_swap;
 extern crate bitvec;
 extern crate init_array;
+extern crate slice_dst;
 extern crate static_assertions;
 
 #[cfg(test)]
