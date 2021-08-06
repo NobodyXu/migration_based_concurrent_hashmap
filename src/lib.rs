@@ -1,8 +1,8 @@
 extern crate arc_swap;
 extern crate bitvec;
 extern crate init_array;
-extern crate slice_dst;
 extern crate static_assertions;
+extern crate triomphe;
 
 #[cfg(test)]
 extern crate assert_matches;
