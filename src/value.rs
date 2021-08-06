@@ -53,6 +53,7 @@ impl<T: RefCnt> Default for Value<T> {
     }
 }
 impl<T: RefCnt> Value<T> {
+    #[inline(always)]
     fn map_ptr(ptr: *mut T::Base) -> *mut T::Base {
         if ptr.is_null() {
             (SlotIndex::max() + 1) as *mut T::Base
