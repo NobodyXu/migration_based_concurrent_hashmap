@@ -43,7 +43,7 @@ impl SlotIndex {
 pub enum Value<T: RefCnt> {
     None,
     Deleted,
-    Migrated(SlotIndex),
+    Migrated,
     Some(T),
 }
 impl<T: RefCnt> Default for Value<T> {
@@ -56,7 +56,7 @@ impl<T: RefCnt> Value<T> {
     #[inline(always)]
     fn map_ptr(ptr: *mut T::Base) -> *mut T::Base {
         if ptr.is_null() {
-            (SlotIndex::max() + 1) as *mut T::Base
+            3 as *mut T::Base
         } else {
             ptr
         }
@@ -69,7 +69,7 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
         match me {
             Self::None => ptr::null_mut(),
             Self::Deleted => 1 as *mut Self::Base,
-            Self::Migrated(index) => index.to_ptr() as *mut Self::Base,
+            Self::Migrated => 2 as *mut Self::Base,
             Self::Some(value) => Self::map_ptr(RefCnt::into_ptr(value)),
         }
     }
@@ -78,7 +78,7 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
         match me {
             Self::None => ptr::null_mut(),
             Self::Deleted => 1 as *mut Self::Base,
-            Self::Migrated(index) => index.to_ptr() as *mut Self::Base,
+            Self::Migrated => 2 as *mut Self::Base,
             Self::Some(value) => Self::map_ptr(RefCnt::as_ptr(value)),
         }
     }
@@ -88,9 +88,9 @@ unsafe impl<T: RefCnt> RefCnt for Value<T> {
             Self::None
         } else if (ptr as usize) == 1 {
             Self::Deleted
-        } else if (ptr as usize) <= SlotIndex::max() {
-            Self::Migrated(SlotIndex::new_unchecked(ptr as u8))
-        } else if (ptr as usize) == (SlotIndex::max() + 1) {
+        } else if (ptr as usize) == 2 {
+            Self::Migrated
+        } else if (ptr as usize) == 3 {
             Self::Some(T::from_ptr(ptr::null()))
         } else {
             Self::Some(T::from_ptr(ptr))
@@ -145,38 +145,33 @@ mod tests {
 
     #[test]
     fn test_migrated() {
-        for i in 2..(u8::MAX) {
-            let index = SlotIndex::new(i).unwrap();
-            assert_eq!(i as usize, index.to_ptr() as usize);
-
-            let value = Value::Migrated(index);
-            assert_eq!(i as usize, RefCnt::as_ptr(&value) as usize);
-            assert_eq!(i as usize, RefCnt::inc(&value) as usize);
-            unsafe {
-                <Value as RefCnt>::dec(index.to_ptr());
-            }
-            assert_eq!(i as usize, RefCnt::into_ptr(value) as usize);
-
-            assert_matches!(
-                unsafe { RefCnt::from_ptr(i as usize as *const _) },
-                Value::Migrated(index) if index.to_raw() == i
-            );
+        let value = Value::Migrated;
+        assert_eq!(2 as usize, RefCnt::as_ptr(&value) as usize);
+        assert_eq!(2 as usize, RefCnt::inc(&value) as usize);
+        unsafe {
+            <Value as RefCnt>::dec(2 as *const _);
         }
+        assert_eq!(2 as usize, RefCnt::into_ptr(value) as usize);
+
+        assert_matches!(
+            unsafe { RefCnt::from_ptr(2 as *const _) },
+            Value::Migrated
+        );
     }
 
     #[test]
     fn test_no_arc() {
         let value = Value::Some(None);
 
-        assert_eq!(SlotIndex::max() + 1, RefCnt::as_ptr(&value) as usize);
-        assert_eq!(SlotIndex::max() + 1, RefCnt::inc(&value) as usize);
+        assert_eq!(3, RefCnt::as_ptr(&value) as usize);
+        assert_eq!(3, RefCnt::inc(&value) as usize);
         unsafe {
-            <Value as RefCnt>::dec((SlotIndex::max() + 1) as *const ());
+            <Value as RefCnt>::dec(3 as *const ());
         }
-        assert_eq!(SlotIndex::max() + 1, RefCnt::into_ptr(value) as usize);
+        assert_eq!(3, RefCnt::into_ptr(value) as usize);
 
         assert_matches!(
-            unsafe { RefCnt::from_ptr((SlotIndex::max() + 1) as *const ()) },
+            unsafe { RefCnt::from_ptr(3 as *const ()) },
             Value::Some(None)
         );
     }
