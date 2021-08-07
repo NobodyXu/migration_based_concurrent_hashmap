@@ -39,6 +39,7 @@ impl SlotIndex {
     }
 }
 
+/// Value assumes addresses from `0x0` to `0x3` are unused.
 #[derive(Clone, Debug)]
 pub enum Value<T: RefCnt> {
     None,
