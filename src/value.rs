@@ -2,43 +2,6 @@ use core::ptr;
 
 use crate::RefCnt;
 
-/// SlotIndex assumes the first 256 bytes of the address space are unused.
-#[derive(Copy, Clone, Debug)]
-pub struct SlotIndex(u8);
-impl SlotIndex {
-    #[inline(always)]
-    pub const fn new(index: u8) -> Option<Self> {
-        if index < 2 || index == u8::MAX {
-            None
-        } else {
-            Some(Self(index))
-        }
-    }
-
-    /// # Safety
-    ///
-    ///  - `index` - Must be greater than `1` and less than or equal to `Self::max()`.
-    #[inline(always)]
-    pub const unsafe fn new_unchecked(index: u8) -> Self {
-        Self(index)
-    }
-
-    #[inline(always)]
-    pub const fn to_raw(self) -> u8 {
-        self.0
-    }
-
-    #[inline(always)]
-    const fn max() -> usize {
-        (u8::MAX - 1) as usize
-    }
-
-    #[inline(always)]
-    const fn to_ptr(self) -> *mut () {
-        self.0 as *mut ()
-    }
-}
-
 /// Value assumes addresses from `0x0` to `0x3` are unused.
 #[derive(Clone, Debug)]
 pub enum Value<T: RefCnt> {
@@ -104,7 +67,7 @@ mod tests {
     use core::ptr;
     use assert_matches::assert_matches;
 
-    use super::{SlotIndex, RefCnt};
+    use super::RefCnt;
 
     type Arc = std::sync::Arc<()>;
     type Value = super::Value<Option<Arc>>;
